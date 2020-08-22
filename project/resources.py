@@ -1,9 +1,12 @@
 """
 some comment
 """
+import time
+
 import cv2
 import falcon
 from imutils.video import VideoStream
+
 
 class HTMLResource:
     """
@@ -27,16 +30,15 @@ class VideoResource:
         resp.content_type = "multipart/x-mixed-replace; boundary=frame"
         resp.stream = labeled_frame
 
-    def _get_frame(self, camera, fps=100000):
-        fps_count = 0
-        import time
+    def _get_frame(self, camera, fps=1 / 100000):
+        frame_count = 0
         time.sleep(2)
         while True:
-            if fps_count % fps == 0:
+            if frame_count % 1 / fps == 0:
                 image = camera.read()
                 _, jpeg = cv2.imencode(".jpg", image)
                 yield (
                     b"--frame\r\n"
                     b"Content-Type: image/jpeg\r\n\r\n" + jpeg.tobytes() + b"\r\n\r\n"
                 )
-            fps_count += 1
+            frame_count += 1
